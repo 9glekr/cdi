@@ -23,6 +23,15 @@ body {
 }
 
 
+
+.map-controls {
+  position:absolute;
+  z-index: 2;
+  width: 100%;
+  text-align: right;
+}
+
+
 .overlaybox {position:relative;width:360px;height:350px;background:url('./box_movie.png') no-repeat;padding:15px 10px;}
 .overlaybox div, ul {overflow:hidden;margin:0;padding:0;}
 .overlaybox li {list-style: none;}
