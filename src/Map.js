@@ -19,7 +19,7 @@ const Map = () => {
         let map;
         const markerImageSrc = "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png";
         /**
-         *
+         * 위치 정보
          * @type {function(): Promise<any>}
          */
         const getPosition = (async () => {
@@ -27,7 +27,12 @@ const Map = () => {
                 navigator.geolocation.getCurrentPosition(resolve, reject);
             })
         });
-        const devOverlay = (position => {
+        /**
+         * 오버레이 생성
+         * @deprecated
+         * @type {Function}
+         */
+        const devMakeOverlay = (position => {
             var content = '<div class="overlaybox">' +
                 '    <div class="boxtitle">' + position.title + '</div>' +
                 // '    <div class="first">' +
@@ -67,8 +72,7 @@ const Map = () => {
             var customOverlay = new kakao.maps.CustomOverlay({
                 position: position.latlng,
                 content: content,
-                xAnchor: 0.3,
-                yAnchor: 0.91,
+                //xAnchor: 0.3, yAnchor: 0.91,
                 xAnchor: 0.12,
                 yAnchor: 0.34
             });
@@ -76,11 +80,16 @@ const Map = () => {
             // 커스텀 오버레이를 지도에 표시합니다
             customOverlay.setMap(map);
         });
+        /**
+         * 클릭한 위치의 위도, 경도 정보 구하기
+         * @deprecated
+         * @type {Function}
+         */
         const devGetPosition = (()=> {
             // 지도를 클릭한 위치에 표출할 마커입니다
             var marker = new kakao.maps.Marker({
                 // 지도 중심좌표에 마커를 생성합니다
-                position: map.getCenter()
+                // position: map.getCenter()
             });
             // 지도에 마커를 표시합니다
             marker.setMap(map);
@@ -101,6 +110,7 @@ const Map = () => {
          */
         const getBookmarkList = (() => {
             return [
+                { title: '!', content: '', latlng: new kakao.maps.LatLng(33.50621457703129, 126.49260830819038) },
                 { title: 'SK제주렌터카', content: '1구역 8승강장 탑승', latlng: new kakao.maps.LatLng(33.49410570464006, 126.45021706453184) },
                 { title: '한라수목원', content: '', latlng: new kakao.maps.LatLng(33.47004089300059, 126.49106838651365) },
                 { title: '금오름', content: '', latlng: new kakao.maps.LatLng(33.351073513606224, 126.3057296610338) },
@@ -109,7 +119,7 @@ const Map = () => {
             ];
         });
         /**
-         *
+         * 마커 생성
          * @type {Function}
          */
         const makeMarker = (() => {
@@ -130,33 +140,46 @@ const Map = () => {
                     image : markerImage // 마커 이미지
                 });
 
-                devOverlay({ title: 'TEST', latlng: new kakao.maps.LatLng(33.50621457703129, 126.49260830819038) });
-
-                devOverlay(positions[i]);
+                // 오버레이 생성
+                devMakeOverlay(positions[i]);
 
             }
         });
+
         /**
-         *
-         * @returns {Promise<Map<any, any> | *>}
+         * 맵 생성
+         * @param position 실시간 위치 정보
+         * @returns {Map<any, any> | *}
          */
-        async function initialize() {
-            const position = await getPosition();
+        function makeMap(position) {
             const container = document.getElementById('myMap');
             const options = {
                 //center: new kakao.maps.LatLng(position.coords.latitude, position.coords.longitude),
                 center: new kakao.maps.LatLng(33.50621457703129, 126.49260830819038),
-                level: 3,
+                level: 5,
                 animate: true
             };
-
+            // 맵 생성
             map = new kakao.maps.Map(container, options);
-
+            // 실시간 교통상황
             map.addOverlayMapTypeId(kakao.maps.MapTypeId.TRAFFIC);
 
+            return map;
+        }
+        /**
+         * initialize
+         * @returns {Promise<Map<any, any> | *>}
+         */
+        async function initialize() {
+            const position = await getPosition();
+
+            // 맵 생성
+            makeMap(position);
+
+            // 마커 생성
             makeMarker();
 
-            //dev
+            // 개발용
             devGetPosition();
 
             return map;
