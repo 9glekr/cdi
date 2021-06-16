@@ -17,6 +17,10 @@ const Map = () => {
     const classes = useStyles();
 
     const [map, setMap] = useState();
+    const [myLocationOverlay, setMyLocationOverlay] = useState({});
+    const [autoLocation, setAutoLocation] = useState(false);
+
+    const [refresh, setRefresh] = useState(true);
 
     const kakaoMap = (() => {
 
@@ -72,11 +76,11 @@ const Map = () => {
         const getBookmarkList = (() => {
             return [
                 { title: '!', content: '', latlng: new kakao.maps.LatLng(33.50621457703129, 126.49260830819038) },
-                { title: 'SK제주렌터카', content: '1구역 8승강장 탑승', latlng: new kakao.maps.LatLng(33.49410570464006, 126.45021706453184) },
+                /*{ title: 'SK제주렌터카', content: '1구역 8승강장 탑승', latlng: new kakao.maps.LatLng(33.49410570464006, 126.45021706453184) },
                 { title: '한라수목원', content: '', latlng: new kakao.maps.LatLng(33.47004089300059, 126.49106838651365) },
                 { title: '금오름', content: '', latlng: new kakao.maps.LatLng(33.351073513606224, 126.3057296610338) },
                 { title: '오셜록티뮤지엄', content: '', latlng: new kakao.maps.LatLng(33.30535175704833, 126.28951908209946) },
-                { title: '카멜리아힐', content: '', latlng: new kakao.maps.LatLng(33.29039062256073, 126.36818166726451) },
+                { title: '카멜리아힐', content: '', latlng: new kakao.maps.LatLng(33.29039062256073, 126.36818166726451) },*/
             ];
         });
 
@@ -173,17 +177,52 @@ const Map = () => {
         /**
          * 내 위치로 이동
          */
-        async function myLocations() {
+        function myLocations() {
+            if (isEmptyMap()) return;
+
+            setAutoLocation(!autoLocation);
+        }
+
+        async function moveLocation(test) {
             if (isEmptyMap()) return;
 
             const position = await getPosition();
             const coords = position.coords;
-            // 이동할 위도 경도 위치를 생성합니다
-            var moveLatLon = new kakao.maps.LatLng(coords.latitude, coords.longitude);
 
+            if (myLocationOverlay.Eb) {
+                //myLocationOverlay.setMap(null);
+                //myLocationOverlay.setPosition(new kakao.maps.LatLng(coords.latitude, coords.longitude));
+
+                myLocationOverlay.setOptions({
+                    center : new kakao.maps.LatLng(coords.latitude, coords.longitude),  // 원의 중심좌표 입니다
+                    radius: Math.pow(2, map.getLevel()),
+                    strokeWeight: 1, // 선의 두께입니다
+                    strokeColor: '#000', // 선의 색깔입니다
+                    strokeOpacity: 1, // 선의 불투명도 입니다 1에서 0 사이의 값이며 0에 가까울수록 투명합니다
+                    fillColor: '#FA0000', // 채우기 색깔입니다
+                    fillOpacity: 0.7  // 채우기 불투명도 입니다
+                });
+
+                setRefresh(true);
+            } else {
+                setMyLocationOverlay(new kakao.maps.Circle({
+                    center : new kakao.maps.LatLng(coords.latitude, coords.longitude),  // 원의 중심좌표 입니다
+                    radius: Math.pow(2, map.getLevel()),
+                    strokeWeight: 1, // 선의 두께입니다
+                    strokeColor: '#000', // 선의 색깔입니다
+                    strokeOpacity: 1, // 선의 불투명도 입니다 1에서 0 사이의 값이며 0에 가까울수록 투명합니다
+                    fillColor: '#FA0000', // 채우기 색깔입니다
+                    fillOpacity: 0.7  // 채우기 불투명도 입니다
+                }));
+            }
+
+
+            // 이동할 위도 경도 위치를 생성합니다
+            //var moveLatLon = new kakao.maps.LatLng(coords.latitude, coords.longitude);
             // 지도 중심을 부드럽게 이동시킵니다
             // 만약 이동할 거리가 지도 화면보다 크면 부드러운 효과 없이 이동합니다
-            map.panTo(moveLatLon);
+            //map.panTo(moveLatLon);
+
         }
 
         /**
@@ -220,12 +259,35 @@ const Map = () => {
             return map === undefined;
         }
 
-        return { initialize, myLocations, addMarker, addTRAFFIC, devGetPosition }
+        return {
+            initialize,
+            myLocations,
+            moveLocation,
+            addMarker,
+            addTRAFFIC,
+            devGetPosition
+        }
 
     })();
 
 
+    /**
+     * 1초 간격으로 현 위치를 갱신
+     */
     useEffect(() => {
+/*
+        const reloadTimeout = setTimeout(() => {
+            kakaoMap.moveLocation();
+        }, 2500);
+
+        return () => clearTimeout(reloadTimeout);
+*/
+    }, [map, myLocationOverlay, refresh]);
+    /**
+     * 맵 생성
+     */
+    useEffect(() => {
+/*
         if( map === undefined ) return;
 
         // 실시간 교통정보 생성
@@ -235,10 +297,34 @@ const Map = () => {
         // 개발용
         kakaoMap.devGetPosition();
 
+        // 지도가 확대 또는 축소되면 마지막 파라미터로 넘어온 함수를 호출하도록 이벤트를 등록합니다
+        kakao.maps.event.addListener(map, 'zoom_changed', function() {
+            console.log('zoom changed');
+            // 지도의 현재 레벨을 얻어옵니다
+            // kakaoMap.myLocations();
+            console.log(myLocationOverlay);
+        });
+*/
     }, [map]);
-
+    /**
+     * 현 위치 마커 표시
+     */
     useEffect(() => {
+/*
+        if( map === undefined || myLocationOverlay.Eb === null || !refresh) return;
+
+        myLocationOverlay.setMap(map);
+
+        setRefresh(false);
+*/
+    }, [myLocationOverlay, refresh]);
+    /**
+     * 최초 생성
+     */
+    useEffect(() => {
+/*
         kakaoMap.initialize();
+*/
     }, []);
 
     return (<>
