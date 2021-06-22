@@ -36,6 +36,7 @@ function App() {
             className={classes.mainBackground}
             component="img"
             image={imageURL}
+            alt=""
             onClick={handlerClick}
         />
     </>)

@@ -45,11 +45,11 @@ body {
 .overlaybox li textarea {padding: 0; background: transparent; border: none; color: white; height: 55px; width: 100%; resize: none; outline: none; font-weight: bold}
 .overlaybox li span {display:inline-block;}
 .overlaybox li .number {font-size:16px;font-weight:bold;}
-.overlaybox li .title {font-size:10px;}
+.overlaybox li .title {font-size:12px;}
 .overlaybox ul .arrow {position:absolute;margin-top:8px;right:25px;width:5px;height:3px;background:url('https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/updown.png') no-repeat;}
 .overlaybox li .up {background-position:0 -40px;}
 .overlaybox li .down {background-position:0 -60px;}
-.overlaybox li .count {position:absolute;margin-top:5px;right:15px;font-size:10px;}
+.overlaybox li .count {position:absolute;margin-top:5px;right:15px;font-size:12px;}
 .overlaybox li:hover {color:#fff;background:#d24545;}
 .overlaybox li:hover .up {background-position:0 0px;}
 .overlaybox li:hover .down {background-position:0 -20px;}
